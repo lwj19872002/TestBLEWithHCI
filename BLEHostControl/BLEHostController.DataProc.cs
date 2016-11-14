@@ -52,6 +52,22 @@ namespace BLEHostControl
         }
     }
 
+    public class DeviceInfoVal
+    {
+        public byte EventType { get; set; }
+        public byte AddrType { get; set; }
+        public List<byte> Addr { get; set; }
+        public byte RSSI { get; set; }
+        public byte DataLen { get; set; }
+        public List<byte> DataField { get; set; }
+
+        public DeviceInfoVal()
+        {
+            Addr = new List<byte>();
+            DataField = new List<byte>();
+        }
+    }
+
     public partial class BLEHostController
     {
         private List<byte> _dataBuf = new List<byte>();
@@ -603,8 +619,10 @@ namespace BLEHostControl
                     case Opcode.GAPConfDevAddr:
                         break;
                     case Opcode.GAPDevDiscReq:
+                        args.Message = "GAP Device Scan CMD processed.";
                         break;
                     case Opcode.GAPDevDiscCancel:
+                        args.Message = "GAP Stop Device Scan CMD processed.";
                         break;
                     case Opcode.GAPMakeDisc:
                         break;

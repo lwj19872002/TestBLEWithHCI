@@ -33,7 +33,7 @@ namespace TestBLEWithHCI
             hc.ConnectToHost();
 
             Thread.Sleep(200);
-
+             
             hc.InitHost();
 
             Console.ReadKey();

@@ -788,23 +788,74 @@ namespace BLEHostControl
         ATTHandleValIndi = 0x051D,
         ATTHandleValConf = 0x051E,
 
+        /// <summary>
+        /// GAP Device Init Done
+        /// </summary>
         GAPDevInitDone = 0x0600,
+        /// <summary>
+        /// GAP Device Discovery
+        /// </summary>
         GAPDeviDisc = 0x0601,
+        /// <summary>
+        /// GAP Advert Data Update Done
+        /// </summary>
         GAPAdvertDataUpdateDone = 0x0602,
+        /// <summary>
+        /// GAP Make Discoverable Done
+        /// </summary>
         GAPMakeDiscDone = 0x0603,
+        /// <summary>
+        /// GAP End Discoverable Done
+        /// </summary>
         GAPEndDiscDone = 0x0604,
+        /// <summary>
+        /// GAP Link Established
+        /// </summary>
         GAPLinkEstablished = 0x0605,
+        /// <summary>
+        /// GAP Link Terminated
+        /// </summary>
         GAPLinkTerminated = 0x0606,
+        /// <summary>
+        /// GAP Link Parameter Update
+        /// </summary>
         GAPLinkParamUpdate = 0x0607,
+        /// <summary>
+        /// GAP Random Address Changed
+        /// </summary>
         GAPRandomAddrChanged = 0x0608,
+        /// <summary>
+        /// GAP Signature Updated
+        /// </summary>
         GAPSignatureUpdated = 0x0609,
+        /// <summary>
+        /// GAP Authentication Complete
+        /// </summary>
         GAPAuthComplete = 0x060A,
+        /// <summary>
+        /// GAP Passkey Needed
+        /// </summary>
         GAPPasskeyNeeded = 0x060B,
+        /// <summary>
+        /// GAP Slave Requested Security
+        /// </summary>
         GAPSlaveReqSecurity = 0x060C,
+        /// <summary>
+        /// GAP Device Information
+        /// </summary>
         GAPDevInfor = 0x060D,
+        /// <summary>
+        /// GAP Bond Complete
+        /// </summary>
         GAPBondComplete = 0x060E,
+        /// <summary>
+        /// GAP Pairing Requested
+        /// </summary>
         GAPPairingReq = 0x060F,
 
+        /// <summary>
+        /// Command Status
+        /// </summary>
         CMDStatus = 0x067F,
     }
 
