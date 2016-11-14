@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBLEWithHCI", "TestBLEWithHCI\TestBLEWithHCI.csproj", "{1132DC94-8B13-4509-B94A-549C8997F98D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLEHostControl", "BLEHostControl\BLEHostControl.csproj", "{24145B7A-7246-477D-8CCD-D8CE30759757}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1132DC94-8B13-4509-B94A-549C8997F98D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1132DC94-8B13-4509-B94A-549C8997F98D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1132DC94-8B13-4509-B94A-549C8997F98D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1132DC94-8B13-4509-B94A-549C8997F98D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24145B7A-7246-477D-8CCD-D8CE30759757}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24145B7A-7246-477D-8CCD-D8CE30759757}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24145B7A-7246-477D-8CCD-D8CE30759757}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24145B7A-7246-477D-8CCD-D8CE30759757}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
