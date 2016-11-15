@@ -107,5 +107,16 @@ namespace BLEHostControl
         {
             SendCommand(Opcode.GAPDevDiscCancel, null);
         }
+
+        private void SendEstablishLinkReqCMD(byte highDutyCycle, WhiteList wl, AddrType at, List<byte> addr)
+        {
+            List<byte> param = new List<byte>();
+            param.Add(highDutyCycle);
+            param.Add((byte)wl);
+            param.Add((byte)at);
+            param.AddRange(addr);
+
+            SendCommand(Opcode.GAPEstablishLinkReq, param);
+        }
     }
 }

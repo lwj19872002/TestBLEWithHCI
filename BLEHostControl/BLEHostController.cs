@@ -46,6 +46,7 @@ namespace BLEHostControl
         /// </summary>
         public void ClosePort()
         {
+            _linker.StopReadTask();
             _linker.ClosePort();
         }
         
@@ -86,6 +87,15 @@ namespace BLEHostControl
         public void StopDeviceScan()
         {
             SendGAPDeviceDiscoveryCancelCMD();
+        }
+
+        /// <summary>
+        /// 开始请求连接设备
+        /// </summary>
+        /// <param name="dev">设备信息</param>
+        public void EstablishLinkRequest(DeviceInfoVal dev)
+        {
+            SendEstablishLinkReqCMD(0x00, 0x00, dev.AddrTypeVal, dev.Addr);
         }
     }
 }

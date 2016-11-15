@@ -12,14 +12,17 @@ namespace TestBLEWithHCI
     {
         private bool _bToNext = false;
         private BLEHostController _hc;
+        private List<DeviceInfoVal> _BLEDevs;
 
         public TestBLEHost()
         {
             _hc = new BLEHostController();
+            _BLEDevs = new List<DeviceInfoVal>();
             _hc.OnDeviceInitDone += Hc_OnDeviceInitDone;
             _hc.OnCMDStatus += Hc_OnCMDStatus;
             _hc.OnScanDeviceInformation += Hc_OnScanDeviceInformation;
             _hc.OnDeviceDiscoveryDone += Hc_OnDeviceDiscoveryDone;
+            _hc.OnLinkEstablished += hc_OnLinkEstablished;
 
         }
 
@@ -48,10 +51,41 @@ namespace TestBLEWithHCI
             while (!_bToNext) { Thread.Sleep(20); }
 
             _bToNext = false;
+            _BLEDevs.Clear();
             _hc.StartDeviceScan();
             while (!_bToNext) { Thread.Sleep(200); }
 
+            
+            if (_BLEDevs.Count > 0)
+            {
+                _bToNext = false;
+                _hc.EstablishLinkRequest(_BLEDevs[0]);
+                while (!_bToNext) { Thread.Sleep(200); }
+            }
+            else
+            {
+                Console.WriteLine("No device!");
+            }
+
+
+            
+
             _hc.ClosePort();
+        }
+
+        private void hc_OnLinkEstablished(object sender, LinkEstablishedArgs e)
+        {
+            if (e.Status == 0x00)
+            {
+                Console.WriteLine("Device link established!");
+                Console.WriteLine("Addr: {0:X2}:{1:X2}:{2:X2}:{3:X2}:{4:X2}:{5:X2}", e.Addr[5], e.Addr[4], e.Addr[3], e.Addr[2], e.Addr[1], e.Addr[0]);
+                _bToNext = true;
+            }
+            else
+            {
+                Console.WriteLine("Device link failed!");
+            }
+
         }
 
         private void Hc_OnDeviceDiscoveryDone(object sender, DeviceDiscDoneArgs e)
@@ -66,6 +100,20 @@ namespace TestBLEWithHCI
             Console.WriteLine("AddrType: 0x{0:X2}", (byte)e.AddrTypeVal);
             Console.WriteLine("EventType: 0x{0:X2}", (byte)e.EventTypeVal);
             Console.WriteLine("Addr: {0:X2}:{1:X2}:{2:X2}:{3:X2}:{4:X2}:{5:X2}", e.Addr[5], e.Addr[4], e.Addr[3], e.Addr[2], e.Addr[1], e.Addr[0]);
+            Console.WriteLine("Device Name: {0}", e.DeviceName);
+            Console.WriteLine("Sevices:");
+            if (e.CompleteServiceUUIDs.Count > 0)
+            {
+                for (int i = 0; i < e.CompleteServiceUUIDs.Count; i++)
+                {
+                    Console.WriteLine("0x{0:X4}", e.CompleteServiceUUIDs[i]);
+                    if (e.CompleteServiceUUIDs[i] == 0x180D)
+                    {
+                        _BLEDevs.Add(e);
+                    }
+                }
+            }
+            
         }
 
         private void Hc_OnCMDStatus(object sender, CMDStatusArgs e)

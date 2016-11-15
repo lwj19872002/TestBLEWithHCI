@@ -84,11 +84,33 @@ namespace BLEHostControl
         public byte RSSI { get; set; }
         public byte DataLen { get; set; }
         public List<byte> DataField { get; set; }
+        public List<UInt16> CompleteServiceUUIDs { get; set; }
+        public string DeviceName { get; set; }
 
         public DeviceInfoVal()
         {
             Addr = new List<byte>();
             DataField = new List<byte>();
+            CompleteServiceUUIDs = new List<ushort>();
+            DeviceName = "";
+        }
+    }
+
+    public class LinkEstablishedArgs
+    {
+        public byte Status { get; set; }
+        public AddrType AddrTypeVal { get; set; }
+        public List<byte> Addr { get; set; }
+        public UInt16 ConnHandle { get; set; }
+        public byte ConnRole { get; set; }
+        public UInt16 ConnInterval { get; set; }
+        public UInt16 ConnLatency { get; set; }
+        public UInt16 ConnTimeout { get; set; }
+        public byte ClockAccuracy { get; set; }
+
+        public LinkEstablishedArgs()
+        {
+            Addr = new List<byte>();
         }
     }
 
@@ -100,6 +122,7 @@ namespace BLEHostControl
         public event EventHandler<CMDStatusArgs> OnCMDStatus;
         public event EventHandler<DeviceInfoVal> OnScanDeviceInformation;
         public event EventHandler<DeviceDiscDoneArgs> OnDeviceDiscoveryDone;
+        public event EventHandler<LinkEstablishedArgs> OnLinkEstablished;
 
         private void ReadDataProc(Byte[] datas, int iLen)
         {
@@ -360,6 +383,7 @@ namespace BLEHostControl
                 case SpecEventOpcode.GAPEndDiscDone:
                     break;
                 case SpecEventOpcode.GAPLinkEstablished:
+                    ProcessLinkEstablished(datas);
                     break;
                 case SpecEventOpcode.GAPLinkTerminated:
                     break;
@@ -907,7 +931,7 @@ namespace BLEHostControl
         private void ProcessDeviceInformation(List<byte> datas)
         {
             DeviceInfoVal devInfo = new DeviceInfoVal();
-
+            
             devInfo.EventTypeVal = (EventType)datas[3];
 
             devInfo.AddrTypeVal = (AddrType)datas[4];
@@ -926,6 +950,38 @@ namespace BLEHostControl
             for (int i = 0; i < devInfo.DataLen; i++)
             {
                 devInfo.DataField.Add(datas[13 + i]);
+            }
+
+            int iDex = 0;
+            while (iDex < devInfo.DataField.Count)
+            {
+                List<byte> dataBuf = new List<byte>();
+                for (int i = 0; i < devInfo.DataField[iDex] + 1; i++)
+                {
+                    dataBuf.Add(devInfo.DataField[iDex + i]);
+                }
+
+                switch (dataBuf[1])
+                {
+                    case 0x03: // Complete list of 16 bit service UUIDs.
+                        for (int i = 0; i < (dataBuf[0] - 1) / 2; i++)
+                        {
+                            devInfo.CompleteServiceUUIDs.Add((UInt16)((UInt16)dataBuf[2 + 2 * i] | ((UInt16)dataBuf[3 + i * 2] << 8)));
+                        }
+                        break;
+                    case 0x09: // Complete local device name
+                        List<char> temp = new List<char>();
+                        for (int i = 0; i < dataBuf[0] - 1; i++)
+                        {
+                            temp.Add((char)dataBuf[2 + i]);
+                        }
+                        devInfo.DeviceName = new string(temp.ToArray());
+                        break;
+                    default:
+                        break;
+                }
+
+                iDex += (devInfo.DataField[iDex] + 1);
             }
 
             OnScanDeviceInformation?.BeginInvoke(this, devInfo, null, null);
@@ -958,6 +1014,26 @@ namespace BLEHostControl
             }
 
             OnDeviceDiscoveryDone?.BeginInvoke(this, args, null, null);
+        }
+
+        private void ProcessLinkEstablished(List<byte> datas)
+        {
+            LinkEstablishedArgs args = new LinkEstablishedArgs();
+
+            args.Status = datas[2];
+            args.AddrTypeVal = (AddrType)datas[3];
+            for (int i = 0; i < 6; i++)
+            {
+                args.Addr.Add(datas[4 + i]);
+            }
+            args.ConnHandle = (UInt16)(datas[10] | ((UInt16)datas[11] << 8));
+            args.ConnRole = datas[12];
+            args.ConnInterval = (UInt16)(datas[13] | ((UInt16)datas[14] << 8));
+            args.ConnLatency = (UInt16)(datas[15] | ((UInt16)datas[16] << 8));
+            args.ConnTimeout = (UInt16)(datas[17] | ((UInt16)datas[18] << 8));
+            args.ClockAccuracy = datas[19];
+
+            OnLinkEstablished?.BeginInvoke(this, args, null, null);
         }
     }
 }
