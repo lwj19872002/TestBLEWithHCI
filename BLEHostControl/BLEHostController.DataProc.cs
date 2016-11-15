@@ -114,15 +114,61 @@ namespace BLEHostControl
         }
     }
 
+    public class HandleValNotificationArgs
+    {
+        public byte Status { get; set; }
+        public UInt16 ConnHandle { get; set; }
+        public byte PduLen { get; set; }
+        public UInt16 Handle { get; set; }
+        public List<byte> Value { get; set; }
+
+        public HandleValNotificationArgs()
+        {
+            Value = new List<byte>();
+        }
+    }
+
+    public class LinkTerminatedArgs
+    {
+        public byte Status { get; set; }
+        public UInt16 ConnHandle { get; set; }
+        public byte Reason { get; set; }
+
+    }
+
     public partial class BLEHostController
     {
         private List<byte> _dataBuf = new List<byte>();
 
+        /// <summary>
+        /// USB Dongle 初始化完成后的事件
+        /// </summary>
         public event EventHandler<DevInitDoneArgs> OnDeviceInitDone;
+        /// <summary>
+        /// 每个CMD发送完后返回的事件
+        /// </summary>
         public event EventHandler<CMDStatusArgs> OnCMDStatus;
+        /// <summary>
+        /// 扫描过程中，如果每扫描到一个设备就会触发一次此事件
+        /// </summary>
         public event EventHandler<DeviceInfoVal> OnScanDeviceInformation;
+        /// <summary>
+        /// 扫描完成事件
+        /// </summary>
         public event EventHandler<DeviceDiscDoneArgs> OnDeviceDiscoveryDone;
+        /// <summary>
+        /// 连接完成事件
+        /// </summary>
         public event EventHandler<LinkEstablishedArgs> OnLinkEstablished;
+        /// <summary>
+        /// 服务器返回Notification数据是的事件
+        /// </summary>
+        public event EventHandler<HandleValNotificationArgs> OnHandleValNotification;
+        /// <summary>
+        /// 连接中断事件
+        /// </summary>
+        public event EventHandler<LinkTerminatedArgs> OnLinkTerminated;
+
 
         private void ReadDataProc(Byte[] datas, int iLen)
         {
@@ -362,6 +408,7 @@ namespace BLEHostControl
                 case SpecEventOpcode.ATTExeWriteResp:
                     break;
                 case SpecEventOpcode.ATTHandleValNoti:
+                    ProcessATTHandleValueNotification(datas);
                     break;
                 case SpecEventOpcode.ATTHandleValIndi:
                     break;
@@ -386,6 +433,7 @@ namespace BLEHostControl
                     ProcessLinkEstablished(datas);
                     break;
                 case SpecEventOpcode.GAPLinkTerminated:
+                    ProcessGAPLinkTerminated(datas);
                     break;
                 case SpecEventOpcode.GAPLinkParamUpdate:
                     break;
@@ -1034,6 +1082,35 @@ namespace BLEHostControl
             args.ClockAccuracy = datas[19];
 
             OnLinkEstablished?.BeginInvoke(this, args, null, null);
+        }
+
+        private void ProcessATTHandleValueNotification(List<byte> datas)
+        {
+            HandleValNotificationArgs args = new HandleValNotificationArgs();
+
+            args.Status = datas[2];
+            args.ConnHandle = (UInt16)(datas[3] | ((UInt16)datas[4] << 8));
+            args.PduLen = datas[5];
+            args.Handle = (UInt16)(datas[6] | ((UInt16)datas[7] << 8));
+
+            args.Value.Clear();
+            for (int i = 0; i < datas.Count - 8; i++)
+            {
+                args.Value.Add(datas[8 + i]);
+            }
+
+            OnHandleValNotification?.BeginInvoke(this, args, null, null);
+        }
+
+        private void ProcessGAPLinkTerminated(List<byte> datas)
+        {
+            LinkTerminatedArgs args = new LinkTerminatedArgs();
+
+            args.Status = datas[2];
+            args.ConnHandle = (UInt16)(datas[3] | ((UInt16)datas[4] << 8));
+            args.Reason = datas[5];
+
+            OnLinkTerminated?.BeginInvoke(this, args, null, null);
         }
     }
 }

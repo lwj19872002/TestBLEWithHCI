@@ -511,6 +511,10 @@ namespace BLEHostControl
         /// </summary>
         GATTDiscCharaByUUID = 0xFD88,
         /// <summary>
+        /// GATT_WriteCharValue (0xFD92)
+        /// </summary>
+        GATTWriteChar = 0xFD92,
+        /// <summary>
         /// GATT Write Long
         /// </summary>
         GATTWriteLong = 0xFD96,

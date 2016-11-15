@@ -97,5 +97,25 @@ namespace BLEHostControl
         {
             SendEstablishLinkReqCMD(0x00, 0x00, dev.AddrTypeVal, dev.Addr);
         }
+
+        /// <summary>
+        /// 终止链接
+        /// </summary>
+        /// <param name="dev">需要断开连接的设备</param>
+        public void TerminateLink(LinkEstablishedArgs dev)
+        {
+            SendGAPTerminateLinkRequestCMD(dev.ConnHandle, 0x13);
+        }
+
+        /// <summary>
+        /// 写Char到服务器
+        /// </summary>
+        /// <param name="connHandle"></param>
+        /// <param name="handle"></param>
+        /// <param name="val"></param>
+        public void GATTWriteCharValue(UInt16 connHandle, UInt16 handle, byte val)
+        {
+            SendWriteCharValueCMD(connHandle, handle, val);
+        }
     }
 }

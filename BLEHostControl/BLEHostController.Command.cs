@@ -118,5 +118,27 @@ namespace BLEHostControl
 
             SendCommand(Opcode.GAPEstablishLinkReq, param);
         }
+
+        private void SendGAPTerminateLinkRequestCMD(UInt16 connHandle, byte reason)
+        {
+            List<byte> param = new List<byte>();
+            param.Add((byte)(connHandle & 0x00FF));
+            param.Add((byte)((connHandle >> 8) & 0x00FF));
+            param.Add(reason);
+
+            SendCommand(Opcode.GAPTerminateLinkReq, param);
+        }
+
+        private void SendWriteCharValueCMD(UInt16 connHandle, UInt16 handle, byte val)
+        {
+            List<byte> param = new List<byte>();
+            param.Add((byte)(connHandle & 0x00FF));
+            param.Add((byte)((connHandle >> 8) & 0x00FF));
+            param.Add((byte)(handle & 0x00FF));
+            param.Add((byte)((handle >> 8) & 0x00FF));
+            param.Add(val);
+
+            SendCommand(Opcode.GATTWriteChar, param);
+        }
     }
 }
