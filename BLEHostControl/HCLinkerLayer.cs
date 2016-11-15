@@ -121,7 +121,7 @@ namespace BLEHostControl
                     catch
                     {
                         //_taskRun = false;
-                        //throw;
+                        throw;
                     }
                     
                     Thread.Sleep(200);

@@ -52,10 +52,34 @@ namespace BLEHostControl
         }
     }
 
+    public class DeviceSimpleInfoVal
+    {
+        public EventType EventTypeVal { get; set; }
+        public AddrType AddrTypeVal { get; set; }
+        public List<byte> Addr { get; set; }
+
+        public DeviceSimpleInfoVal()
+        {
+            Addr = new List<byte>();
+        }
+    }
+
+    public class DeviceDiscDoneArgs
+    {
+        public byte Status { get; set; }
+        public byte NumDevs { get; set; }
+        public List<DeviceSimpleInfoVal> DevInfo { get; set; }
+
+        public DeviceDiscDoneArgs()
+        {
+            DevInfo = new List<DeviceSimpleInfoVal>();
+        }
+    }
+
     public class DeviceInfoVal
     {
-        public byte EventType { get; set; }
-        public byte AddrType { get; set; }
+        public EventType EventTypeVal { get; set; }
+        public AddrType AddrTypeVal { get; set; }
         public List<byte> Addr { get; set; }
         public byte RSSI { get; set; }
         public byte DataLen { get; set; }
@@ -74,6 +98,8 @@ namespace BLEHostControl
 
         public event EventHandler<DevInitDoneArgs> OnDeviceInitDone;
         public event EventHandler<CMDStatusArgs> OnCMDStatus;
+        public event EventHandler<DeviceInfoVal> OnScanDeviceInformation;
+        public event EventHandler<DeviceDiscDoneArgs> OnDeviceDiscoveryDone;
 
         private void ReadDataProc(Byte[] datas, int iLen)
         {
@@ -325,6 +351,7 @@ namespace BLEHostControl
                     ProcessDevInitDone(datas);
                     break;
                 case SpecEventOpcode.GAPDeviDisc:
+                    ProcessDeviceDiscoveryDone(datas);
                     break;
                 case SpecEventOpcode.GAPAdvertDataUpdateDone:
                     break;
@@ -349,6 +376,7 @@ namespace BLEHostControl
                 case SpecEventOpcode.GAPSlaveReqSecurity:
                     break;
                 case SpecEventOpcode.GAPDevInfor:
+                    ProcessDeviceInformation(datas);
                     break;
                 case SpecEventOpcode.GAPBondComplete:
                     break;
@@ -691,7 +719,7 @@ namespace BLEHostControl
                 args.Message = "CMD Failed!";
             }
 
-            OnCMDStatus?.Invoke(this, args);
+            OnCMDStatus?.BeginInvoke(this, args, null, null);
         }
 
         private void ProcessDevInitDone(List<byte> datas)
@@ -724,7 +752,7 @@ namespace BLEHostControl
                 }
             }
 
-            OnDeviceInitDone?.Invoke(this, args);
+            OnDeviceInitDone?.BeginInvoke(this, args, null, null);
         }
 
         private GetParamVal ProcessGetParam(List<byte> datas)
@@ -874,6 +902,62 @@ namespace BLEHostControl
             #endregion
 
             return val;
+        }
+
+        private void ProcessDeviceInformation(List<byte> datas)
+        {
+            DeviceInfoVal devInfo = new DeviceInfoVal();
+
+            devInfo.EventTypeVal = (EventType)datas[3];
+
+            devInfo.AddrTypeVal = (AddrType)datas[4];
+
+            devInfo.Addr.Clear();
+            for (int i = 0; i < 6; i++)
+            {
+                devInfo.Addr.Add(datas[5 + i]);
+            }
+
+            devInfo.RSSI = datas[11];
+
+            devInfo.DataLen = datas[12];
+
+            devInfo.DataField.Clear();
+            for (int i = 0; i < devInfo.DataLen; i++)
+            {
+                devInfo.DataField.Add(datas[13 + i]);
+            }
+
+            OnScanDeviceInformation?.BeginInvoke(this, devInfo, null, null);
+        }
+
+        private void ProcessDeviceDiscoveryDone(List<byte> datas)
+        {
+            DeviceDiscDoneArgs args = new DeviceDiscDoneArgs();
+
+            args.Status = datas[2];
+            args.NumDevs = datas[3];
+
+            if ((args.Status == 0x00) && (args.NumDevs > 0))
+            {
+                args.DevInfo.Clear();
+                for (int i = 0; i < args.NumDevs; i++)
+                {
+                    DeviceSimpleInfoVal devInfo = new DeviceSimpleInfoVal();
+
+                    devInfo.EventTypeVal = (EventType)datas[4 + 8 * i];
+                    devInfo.AddrTypeVal = (AddrType)datas[5 + 8 * i];
+                    devInfo.Addr.Clear();
+                    for (int j = 0; j < 6; j++)
+                    {
+                        devInfo.Addr.Add(datas[6 + 8 * i + j]);
+                    }
+
+                    args.DevInfo.Add(devInfo);
+                }
+            }
+
+            OnDeviceDiscoveryDone?.BeginInvoke(this, args, null, null);
         }
     }
 }

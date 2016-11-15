@@ -1067,4 +1067,48 @@ namespace BLEHostControl
         /// </summary>
         Enable = 0x01,
     }
+
+    public enum EventType
+    {
+        /// <summary>
+        /// 0 Connectable undirected advertisement
+        /// </summary>
+        ConnUndirectedAdver = 0x00,
+        /// <summary>
+        /// 1 Connectable directed advertisement
+        /// </summary>
+        ConnDirectedAdver = 0x01,
+        /// <summary>
+        /// 2 Discoverable undirected advertisement
+        /// </summary>
+        DiscUndirectedAdver = 0x02,
+        /// <summary>
+        /// 3 Non-connectable undirected advertisement
+        /// </summary>
+        NonconnUndirectedAdver = 0x03,
+        /// <summary>
+        /// 4 Scan Response
+        /// </summary>
+        ScanResp = 0x04,
+    }
+
+    public enum AddrType
+    {
+        /// <summary>
+        /// //0 ADDRTYPE_PUBLIC
+        /// </summary>
+        AddrPublic = 0x00,
+        /// <summary>
+        /// //1 ADDRTYPE_STATIC
+        /// </summary>
+        AddrStatic = 0x01,
+        /// <summary>
+        /// //2 ADDRTYPE_PRIVATE_NONRESOLVE
+        /// </summary>
+        AddrPrivateNonresolve = 0x02,
+        /// <summary>
+        /// //3 ADDRTYPE_PRIVATE_RESOLVE
+        /// </summary>
+        AddrPrivateResolve = 0x03,
+    }
 }
